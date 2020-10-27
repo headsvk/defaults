@@ -2,9 +2,12 @@ package me.headsvk.defaults
 
 import me.headsvk.defaults.Defaults.default
 import me.headsvk.defaults.Defaults.register
+import java.time.OffsetDateTime
+import java.util.*
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 class DefaultsTests {
 
@@ -48,11 +51,38 @@ class DefaultsTests {
     }
 
     @Test
+    fun `Register classes`() {
+        register(OffsetDateTime.MIN)
+        assertEquals(OffsetDateTime.MIN, default())
+
+        register(Locale.US)
+        assertEquals(Locale.US, default())
+
+        class Foo(val int: Int)
+        register(Foo(8))
+        assertEquals(8, default<Foo>().int)
+    }
+
+    @Test
+    fun `Fail not registered classes`() {
+        assertFailsWith<IllegalStateException> {
+            default<OffsetDateTime>()
+        }
+        assertFailsWith<IllegalStateException> {
+            default<Locale>()
+        }
+        class Foo(val int: Int)
+        assertFailsWith<IllegalStateException> {
+            default<Foo>()
+        }
+    }
+
+    @Test
     fun `Default simple data class`() {
         data class Foo(
-                val int: Int,
-                val string: String,
-                val list: List<String>,
+            val int: Int,
+            val string: String,
+            val list: List<String>,
         )
 
         assertEquals(Foo(int = 0, string = "", list = emptyList()), default())
@@ -61,9 +91,9 @@ class DefaultsTests {
     @Test
     fun `Default data class with default values`() {
         data class Foo(
-                val int: Int,
-                val optional: Double = 1.2,
-                val string: String,
+            val int: Int,
+            val optional: Double = 1.2,
+            val string: String,
         )
 
         assertEquals(Foo(int = 0, string = ""), default())
@@ -72,14 +102,57 @@ class DefaultsTests {
     @Test
     fun `Default data class with registered values`() {
         data class Foo(
-                val int: Int,
-                val double: Double,
-                val string: String,
+            val int: Int,
+            val double: Double,
+            val string: String,
+            val locale: Locale,
         )
 
         register(5)
         register("foo")
-        assertEquals(Foo(int = 5, double = 0.0, string = "foo"), default())
+        register(Locale.US)
+        assertEquals(
+            Foo(
+                int = 5,
+                double = 0.0,
+                string = "foo",
+                locale = Locale.US,
+            ), default()
+        )
+    }
+
+
+    @Test
+    fun `Default nested data classes with registered values`() {
+        data class Foo(
+            val string: String,
+        )
+
+        data class Bar(
+            val locale: Locale,
+            val foo: Foo,
+        )
+
+        data class Baz(
+            val int: Int,
+            val double: Double,
+            val bar: Bar,
+        )
+
+        register("hello")
+        register(Locale.US)
+        assertEquals(
+            Baz(
+                int = 0,
+                double = 0.0,
+                bar = Bar(
+                    locale = Locale.US,
+                    foo = Foo(
+                        string = "hello",
+                    ),
+                ),
+            ), default()
+        )
     }
 
     @Test

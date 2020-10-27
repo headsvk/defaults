@@ -3,6 +3,9 @@ package me.headsvk.defaults
 import kotlin.reflect.KClass
 import kotlin.reflect.full.primaryConstructor
 
+/**
+ * Entry point for creating default values.
+ */
 public object Defaults {
 
     private val registry = mutableMapOf<KClass<*>, Any>()
@@ -11,6 +14,9 @@ public object Defaults {
         reset()
     }
 
+    /**
+     * Resets registered value bindings to initial state with primitives only.
+     */
     public fun reset() {
         registry.clear()
         register(0)
@@ -23,10 +29,20 @@ public object Defaults {
         register("")
     }
 
+    /**
+     * Registers [value] to be used when calling [default] for [T].
+     * Overrides previous bindings for the class.
+     * Generic classes are not supported.
+     */
     public inline fun <reified T : Any> register(value: T) {
         register(T::class, value)
     }
 
+    /**
+     * Registers [value] to be used when calling [default] for [T].
+     * Overrides previous bindings for the class [kClass].
+     * Generic classes are not supported.
+     */
     public fun <T : Any> register(kClass: KClass<T>, value: T) {
         if (kClass.typeParameters.isNotEmpty()) {
             throw IllegalArgumentException("Registering generic classes is not supported")
@@ -34,10 +50,22 @@ public object Defaults {
         registry[kClass] = value
     }
 
+    /**
+     * Returns a default value registered with [register] for [T]
+     * or an empty Kotlin collection
+     * or a data class instantiated with default values.
+     * Defaults for [Array] are not supported.
+     */
     public inline fun <reified T : Any> default(): T {
         return default(T::class)
     }
 
+    /**
+     * Returns a default value registered with [register] for [T]
+     * or an empty Kotlin collection
+     * or a data class instantiated with default values.
+     * Defaults for [Array] are not supported.
+     */
     @Suppress("UNCHECKED_CAST")
     public fun <T : Any> default(kClass: KClass<T>): T {
         return registry[kClass] as? T ?: run {
