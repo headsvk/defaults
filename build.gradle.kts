@@ -1,5 +1,6 @@
 plugins {
     kotlin("jvm") version "1.4.10"
+    id("jacoco")
 }
 
 group = "me.headsvk.defaults"
@@ -25,4 +26,15 @@ tasks {
     compileTestKotlin {
         kotlinOptions.jvmTarget = "1.8"
     }
+}
+
+tasks.jacocoTestReport {
+    reports {
+        xml.isEnabled = true
+        html.isEnabled = false
+    }
+}
+
+tasks.check {
+    dependsOn(tasks.jacocoTestReport)
 }
