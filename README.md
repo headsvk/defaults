@@ -3,8 +3,20 @@
 
 ![Build](https://github.com/headsvk/defaults/workflows/Build/badge.svg)
 [![codecov](https://codecov.io/gh/headsvk/defaults/branch/main/graph/badge.svg?token=G29O34T1M8)]()
+[![Download](https://api.bintray.com/packages/headsvk/defaults/defaults/images/download.svg) ](https://bintray.com/headsvk/defaults/defaults/_latestVersion)
 
-### How to use
+### Installation
+```
+repositories {
+    jcenter()
+}
+
+dependencies {
+    testImplementation("me.headsvk.defaults:defaults:${version}")
+}
+```
+
+### Usage
 Let's say we have following nested data classes (coming from an api for example):
 ```
 data class Foo(
@@ -45,3 +57,7 @@ assertEquals(Baz(
 
 The created instance of `Baz` is **not a mock** thus data class functions such as `equals`, 
 `toString` and `copy` work as expected.
+
+### Limitations
+Registering defaults for generic classes is not supported but all kotlin collections default to empty.
+
