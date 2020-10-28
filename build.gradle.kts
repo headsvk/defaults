@@ -61,7 +61,6 @@ bintray {
     this.setPublications("release")
 
     with(pkg) {
-        userOrg = "headsvk"
         repo = repoName
         name = project.name
         desc = project.description
@@ -76,7 +75,7 @@ bintray {
         }
     }
     dryRun = false
-    publish = false
+    publish = true
 }
 
 publishing {
