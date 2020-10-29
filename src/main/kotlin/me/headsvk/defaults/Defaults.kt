@@ -25,6 +25,7 @@ public object Defaults {
         register(0.toDouble())
         register(0.toFloat())
         register(0.toShort())
+        register(0.toLong())
         register(false)
         register("")
     }
@@ -63,8 +64,7 @@ public object Defaults {
     /**
      * Returns a default value registered with [register] for [T]
      * or an empty Kotlin collection
-     * or a data class instantiated with default values.
-     * Defaults for [Array] are not supported.
+     * or a data class instantiated with default values or nulls for nullable fields.
      */
     @Suppress("UNCHECKED_CAST")
     public fun <T : Any> default(kClass: KClass<T>): T {
@@ -77,7 +77,6 @@ public object Defaults {
                 kClass == MutableMap::class -> mutableMapOf<Any, Any>() as T
                 kClass == Set::class -> emptySet<Any>() as T
                 kClass == MutableSet::class -> mutableSetOf<Any>() as T
-                kClass.java.isArray -> throw IllegalArgumentException("Default arrays are not supported")
                 else -> throw IllegalStateException("Class $kClass is not registered")
             }
         }
@@ -85,17 +84,22 @@ public object Defaults {
 
     private fun <T : Any> defaultDataClass(kClass: KClass<T>): T {
         val constructor = kClass.primaryConstructor
-                ?: throw IllegalArgumentException("No primary constructor found for data class $kClass")
+            ?: throw IllegalArgumentException("No primary constructor found for data class $kClass")
         val arguments = constructor.parameters.asSequence()
-                .filter { !it.isOptional }
-                .associate { param ->
-                    val paramClass = param.type.classifier
-                    if (paramClass is KClass<*>) {
-                        param to default(paramClass)
-                    } else {
-                        throw IllegalArgumentException("Unsupported type ${param.type.classifier}")
+            .filter { !it.isOptional }
+            .associate { param ->
+                when {
+                    param.type.isMarkedNullable -> {
+                        param to null
+                    }
+                    param.type.classifier is KClass<*> -> {
+                        param to default(param.type.classifier as KClass<*>)
+                    }
+                    else -> {
+                        throw IllegalArgumentException("Unsupported type ${param.type}")
                     }
                 }
+            }
         return constructor.callBy(arguments)
     }
 }

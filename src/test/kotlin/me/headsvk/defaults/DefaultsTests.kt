@@ -19,6 +19,7 @@ class DefaultsTests {
         assertEquals(0.toDouble(), default())
         assertEquals(0.toFloat(), default())
         assertEquals(0.toShort(), default())
+        assertEquals(0.toLong(), default())
         assertEquals(false, default())
         assertEquals("", default())
     }
@@ -42,6 +43,9 @@ class DefaultsTests {
 
         register(8.toShort())
         assertEquals(8.toShort(), default())
+
+        register(9.toLong())
+        assertEquals(9.toLong(), default())
 
         register(true)
         assertEquals(true, default())
@@ -81,11 +85,11 @@ class DefaultsTests {
     fun `Default simple data class`() {
         data class Foo(
             val int: Int,
-            val string: String,
+            val string: String?,
             val list: List<String>,
         )
 
-        assertEquals(Foo(int = 0, string = "", list = emptyList()), default())
+        assertEquals(Foo(int = 0, string = null, list = emptyList()), default())
     }
 
     @Test
@@ -103,7 +107,7 @@ class DefaultsTests {
     fun `Default data class with registered values`() {
         data class Foo(
             val int: Int,
-            val double: Double,
+            val double: Double?,
             val string: String,
             val locale: Locale,
         )
@@ -114,7 +118,7 @@ class DefaultsTests {
         assertEquals(
             Foo(
                 int = 5,
-                double = 0.0,
+                double = null,
                 string = "foo",
                 locale = Locale.US,
             ), default()
