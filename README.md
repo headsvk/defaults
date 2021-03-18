@@ -3,16 +3,16 @@
 
 ![Build](https://github.com/headsvk/defaults/workflows/Build/badge.svg)
 [![codecov](https://codecov.io/gh/headsvk/defaults/branch/main/graph/badge.svg?token=G29O34T1M8)]()
-[![Download](https://api.bintray.com/packages/headsvk/defaults/defaults/images/download.svg) ](https://bintray.com/headsvk/defaults/defaults/_latestVersion)
+[![Download](https://jitpack.io/v/headsvk/defaults.svg)](https://jitpack.io/#headsvk/defaults)
 
 ### Installation
 ```
 repositories {
-    jcenter()
+    maven { url("https://jitpack.io") }
 }
 
 dependencies {
-    testImplementation("me.headsvk.defaults:defaults:${version}")
+    testImplementation("com.github.headsvk:defaults:${version}")
 }
 ```
 
